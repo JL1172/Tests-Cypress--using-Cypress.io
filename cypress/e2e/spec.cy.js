@@ -328,13 +328,13 @@ describe("My second test", () => {
     it("Runs no error",()=> {
       cy.visit("http://localhost:3000/form")
       newArray.map(n=> {
-        cy.get("[data-cy='state']").select(n)
+        cy.get("[data-cy='state']").select(n, {force : true})
         cy.get("[data-cy='stateErr']").should("not.exist")
       })
     })
     it("Runs the error: 'must pick your state'",()=> {
       cy.visit("http://localhost:3000/form")
-      newArray.map(n=> { cy.get("[data-cy='state']").select(n)
+      newArray.map(n=> { cy.get("[data-cy='state']").select(n, {force : true})
       cy.get("[data-cy='state']").select("--Select One--")
       cy.get("[data-cy='stateErr']").should("have.text","*Must pick your state")
     })
@@ -344,11 +344,11 @@ describe("My second test", () => {
     it("Runs no error for programming language selection",()=> {
       cy.visit("http://localhost:3000/form")
       programmingLanguages.map(n=> {
-        cy.get("[data-cy='language']").select(n)
+        cy.get("[data-cy='language']").select(n, { force: true })
         cy.get("[data-cy='languageErr']").should("not.exist")
       })
     })
-    it("Runs no error for programming language selection",()=> {
+    it("Runs error 'Must pick your favorite programming language'",()=> {
       cy.visit("http://localhost:3000/form")
       programmingLanguages.map(n=> {
         cy.get("[data-cy='language']").select(n)
@@ -361,13 +361,13 @@ describe("My second test", () => {
     it("Runs error : 'must be a valid email address'",()=> {
       cy.visit("http://localhost:3000/form")
       cy.get("[data-cy='email']").type("ajsasdflaskjlksbcsdf")
-      cy.get("[data.cy='emailErr']").should("have.text","*Must be a valid email address")
+      cy.get('[data-cy="emailErr"]').should("have.text","*Must be a valid email address")
     })
     it("Runs error : 'email is required'",()=> {
       cy.visit("http://localhost:3000/form")
       cy.get("[data-cy='email']").type("jacoblang72@comcast.net")
       cy.get("[data-cy='email']").clear()
-      cy.get("[data.cy='emailErr']").should("have.text","*Email is required")
+      cy.get('[data-cy="emailErr"]').should("have.text","*Email is required")
     })
   })
   describe("This submits the form and verifies URL of user page",()=> {
@@ -383,8 +383,29 @@ describe("My second test", () => {
      cy.get("[data-cy='state']").select("Delaware")
      cy.get("[data-cy='terms']").click()
      cy.get("[data-cy='submit']").click()
+     cy.url().should("include","/user")
     })
-    it("Verifies URL",()=> {
-      cy.url().should("included","/user")
+  })
+  describe("This toggles the expand and collapse user info",()=> {
+    it("submits the form with all the correct values and expands user info",()=> {
+      cy.visit("http://localhost:3000/form")
+      fl.map(n=> {
+        cy.get(`[data-cy = ${n}`).type(`${n === "fname" ? "Jacob" : "Lang"}`)
+     })
+     cy.get("[data-cy = 'username']").type("jacobl11")
+     cy.get("[data-cy='email']").type("jacoblang72@comcast.net")
+     cy.get("[data-cy='password']").type("abscdwe?1df")
+     cy.get("[data-cy='language']").select("JavaScript")
+     cy.get("[data-cy='state']").select("Delaware")
+     cy.get("[data-cy='terms']").click()
+     cy.get("[data-cy='submit']").click()
+     cy.get("[data-cy='expandOrCollapse']").click()
+     cy.get('[data-cy="nameCard"]').should("have.text","Jacob Lang")
+     cy.get('[data-cy="emailCard"]').should("have.text","jacoblang72@comcast.net")
+     cy.get('[data-cy="usernameCard"]').should("have.text","jacobl11")
+     cy.get('[data-cy="languageCard"]').should("have.text","JavaScript")
+     cy.get('[data-cy="stateCard"]').should("have.text","Delaware")
+     cy.get("[data-cy='expandOrCollapse']").click()
+     cy.get('[data-cy="nameCard"]').should("not.exist")
     })
   })
