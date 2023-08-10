@@ -207,6 +207,29 @@ const result = array.map(n=> {
   }
   return newArray;
 })
+const programmingLanguages = [
+  "Python",
+  "Java",
+  "JavaScript",
+  "C#",
+  "C++",
+  "Ruby",
+  "Swift",
+ " Kotlin",
+  "Go (Golang)",
+  "Rust",
+  "TypeScript",
+  "PHP",
+  "R",
+  "MATLAB",
+  "Perl",
+  "Scala",
+  "Dart",
+  "Lua",
+  "Groovy",
+  "Julia"
+]
+
 
 const fl = ["fname","lname"];
 describe('My first test', () => {
@@ -315,5 +338,53 @@ describe("My second test", () => {
       cy.get("[data-cy='state']").select("--Select One--")
       cy.get("[data-cy='stateErr']").should("have.text","*Must pick your state")
     })
+    })
+  })
+  describe("My seventh test",()=> {
+    it("Runs no error for programming language selection",()=> {
+      cy.visit("http://localhost:3000/form")
+      programmingLanguages.map(n=> {
+        cy.get("[data-cy='language']").select(n)
+        cy.get("[data-cy='languageErr']").should("not.exist")
+      })
+    })
+    it("Runs no error for programming language selection",()=> {
+      cy.visit("http://localhost:3000/form")
+      programmingLanguages.map(n=> {
+        cy.get("[data-cy='language']").select(n)
+        cy.get("[data-cy='language']").select("--Select One--")
+        cy.get("[data-cy='languageErr']").should("have.text","*Must pick your favorite programming language")
+      })
+    })
+  })
+  describe("Eighth test",()=> {
+    it("Runs error : 'must be a valid email address'",()=> {
+      cy.visit("http://localhost:3000/form")
+      cy.get("[data-cy='email']").type("ajsasdflaskjlksbcsdf")
+      cy.get("[data.cy='emailErr']").should("have.text","*Must be a valid email address")
+    })
+    it("Runs error : 'email is required'",()=> {
+      cy.visit("http://localhost:3000/form")
+      cy.get("[data-cy='email']").type("jacoblang72@comcast.net")
+      cy.get("[data-cy='email']").clear()
+      cy.get("[data.cy='emailErr']").should("have.text","*Email is required")
+    })
+  })
+  describe("This submits the form and verifies URL of user page",()=> {
+    it("submits the form with all the correct values",()=> {
+      cy.visit("http://localhost:3000/form")
+      fl.map(n=> {
+        cy.get(`[data-cy = ${n}`).type(`${n === "fname" ? "Jacob" : "Lang"}`)
+     })
+     cy.get("[data-cy = 'username']").type("jacobl11")
+     cy.get("[data-cy='email']").type("jacoblang72@comcast.net")
+     cy.get("[data-cy='password']").type("abscdwe?1df")
+     cy.get("[data-cy='language']").select("JavaScript")
+     cy.get("[data-cy='state']").select("Delaware")
+     cy.get("[data-cy='terms']").click()
+     cy.get("[data-cy='submit']").click()
+    })
+    it("Verifies URL",()=> {
+      cy.url().should("included","/user")
     })
   })
